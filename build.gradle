@@ -1,0 +1,81 @@
+plugins {
+    id 'java'
+    id 'com.gtnewhorizons.retrofuturagradle' version '2.0.2'
+}
+
+group = project.mod_group
+version = project.mod_version
+
+base {
+    archivesName.set('ETVoidMinerAllDrops')
+}
+
+java {
+    toolchain {
+        languageVersion.set(JavaLanguageVersion.of(25))
+        vendor.set(JvmVendorSpec.AZUL)
+    }
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+minecraft {
+    mcVersion.set('1.12.2')
+    mcpMappingChannel.set('stable')
+    mcpMappingVersion.set('39')
+    username.set('Developer')
+    javaCompatibilityVersion.set(8)
+    jvmLanguageVersion.set(JavaLanguageVersion.of(8))
+}
+
+repositories {
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = 'CurseMaven'
+                url = uri('https://cursemaven.com')
+            }
+        }
+        filter {
+            includeGroup('curse.maven')
+        }
+    }
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = 'Modrinth'
+                url = uri('https://api.modrinth.com/maven')
+            }
+        }
+        filter {
+            includeGroup('maven.modrinth')
+        }
+    }
+}
+
+dependencies {
+    compileOnly(rfg.deobf('curse.maven:environmental-tech-245453:2691536')) {
+        transitive = false
+    }
+    compileOnly(rfg.deobf('curse.maven:valkyrielib-245480:2691542')) {
+        transitive = false
+    }
+    compileOnly(rfg.deobf('maven.modrinth:had-enough-items:4.31.2')) {
+        transitive = false
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+}
+
+tasks.named('compileJava', JavaCompile) {
+    options.release.set(8)
+}
+
+processResources {
+    inputs.property('version', project.version)
+    filesMatching('mcmod.info') {
+        expand('version': project.version)
+    }
+}
